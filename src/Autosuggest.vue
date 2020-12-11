@@ -1,28 +1,26 @@
 <template>
   <div :id="componentAttrIdAutosuggest">
-    <slot name="before-input" /><div
-      role="combobox"
-      :aria-expanded="isOpen ? 'true' : 'false'"
-      aria-haspopup="listbox"
-      :aria-owns="`${componentAttrIdAutosuggest}-${componentAttrPrefix}__results`"
-    ><input
+    <slot name="before-input" /><input
       :type="internal_inputProps.type"
       :value="internalValue"
       :autocomplete="internal_inputProps.autocomplete"
+      role="combobox"
       :class="[isOpen ? `${componentAttrPrefix}__input--open` : '', internal_inputProps['class']]"
       v-bind="internal_inputProps"
       aria-autocomplete="list"
-      :aria-activedescendant="isOpen && currentIndex !== null ? `${componentAttrPrefix}__results-item--${currentIndex}` : ''"
       :aria-controls="`${componentAttrIdAutosuggest}-${componentAttrPrefix}__results`"
+      :aria-expanded="isOpen ? 'true' : 'false'"
+      aria-haspopup="dialog"
       @input="inputHandler"
       @keydown="handleKeyStroke"
       v-on="listeners"
-    ></div><slot name="after-input" />
-    <div
-      :id="`${componentAttrIdAutosuggest}-${componentAttrPrefix}__results`"
+    ><slot name="after-input" />
+    <div 
+      :id="`${componentAttrIdAutosuggest}-${componentAttrPrefix}__results`" 
       :class="_componentAttrClassAutosuggestResultsContainer"
+      role="dialog"
     >
-      <div
+      <div 
         v-if="isOpen"
         :class="_componentAttrClassAutosuggestResults"
         :aria-labelledby="componentAttrIdAutosuggest"
@@ -41,7 +39,7 @@
           :component-attr-id-autosuggest="componentAttrIdAutosuggest"
           @updateCurrentIndex="updateCurrentIndex"
         >
-          <template
+          <template 
             :slot="`before-section-${cs.name || cs.label}`"
             slot-scope="{section, className}"
           >
@@ -53,18 +51,18 @@
           </template>
           <template slot-scope="{ suggestion, _key }">
             <slot
-              :suggestion="suggestion"
+              :suggestion="suggestion" 
               :index="_key"
             >
               {{ suggestion.item }}
             </slot>
           </template>
-          <template
+          <template 
             :slot="`after-section-${cs.name || cs.label}`"
             slot-scope="{section}"
           >
-            <slot
-              :name="`after-section-${cs.name || cs.label}`"
+            <slot 
+              :name="`after-section-${cs.name || cs.label}`" 
               :section="section"
             />
           </template>
@@ -86,7 +84,6 @@
 </template>
 
 <script>
-
 /**
  * @typedef {Object} ResultSection
  * @prop {String} name - Name of the section
@@ -99,7 +96,6 @@
  * @prop {Object} ulClass - class for <ul> of section e.g. { 'bg-blue': true }
  * @prop {Object} liClass - class for all <li>'s in section
  */
-
 /**
  * @typedef {Object} ResultItem
  * @prop {Object<any>} item - data object
@@ -107,17 +103,13 @@
  * @prop {ResultSection.label} label
  * @prop {ResultSection.type} type
  */
-
 import DefaultSection from "./parts/DefaultSection.js";
 import { addClass, removeClass } from "./utils";
-
 const INDEX_IS_FOCUSED_ON_INPUT = -1
-
 const defaultSectionConfig = {
   name: "default",
   type: "default-section"
 }
-
 export default {
   name: "Autosuggest",
   components: {
@@ -231,7 +223,7 @@ export default {
     internal_inputProps() {
       return {
         ...this.defaultInputProps,
-        ...this.inputProps
+        ...this.inputProps 
       }
     },
     listeners() {
@@ -282,18 +274,17 @@ export default {
       return this.shouldRenderSuggestions(this.totalResults, this.loading)
     },
     /**
-     * Normalize suggestions into sections based on defaults and section
+     * Normalize suggestions into sections based on defaults and section 
      * configs.
-     * @returns {Array<ResultSection>}
+     * @returns {Array<ResultSection>}  
      */
     computedSections() {
       let tmpSize = 0
       return this.suggestions.map(section => {
         if (!section.data) return;
-
         const name = section.name ? section.name : defaultSectionConfig.name;
         let limit, label, type, ulClass, liClass = null
-
+        
         if (this.sectionConfigs[name]) {
           limit = this.sectionConfigs[name].limit
           type = this.sectionConfigs[name].type
@@ -301,15 +292,12 @@ export default {
           ulClass = this.sectionConfigs[name].ulClass
           liClass = this.sectionConfigs[name].liClass
         }
-
         /** Set defaults for section configs. */
         type = type ? type : defaultSectionConfig.type;
-
         limit = limit || this.limit
         limit = limit ? limit : Infinity;
         limit = section.data.length < limit ? section.data.length : limit;
         label = label ? label : section.label;
-
         const computedSection = {
           name,
           label,
@@ -321,9 +309,9 @@ export default {
           ulClass,
           liClass
         }
-
+        
         tmpSize += limit;
-
+        
         return computedSection
       })
     },
@@ -341,7 +329,7 @@ export default {
         return acc + (data.length >= limit ? limit : data.length)
       }, 0)
     },
-
+    
     _componentAttrClassAutosuggestResultsContainer () {
       return this.componentAttrClassAutosuggestResultsContainer || `${this.componentAttrPrefix}__results-container`
     },
@@ -366,7 +354,7 @@ export default {
     isOpen: {
       handler(newValue, oldValue){
         if (newValue !== oldValue) {
-          this.$emit(newValue ? 'opened' : 'closed');
+          this.$emit(newValue ? 'opened' : 'closed');      
         }
       },
       immediate: true
@@ -431,7 +419,6 @@ export default {
           }
         }
       }
-
       return obj;
     },
     /**
@@ -443,7 +430,6 @@ export default {
      */
     handleKeyStroke(e) {
       const { keyCode } = e;
-
       const ignoredKeyCodes = [
         16, // Shift
         9,  // Tab
@@ -452,11 +438,10 @@ export default {
         91, // OS Key
         93  // Right OS Key
       ];
-
       if (ignoredKeyCodes.indexOf(keyCode) > -1) {
         return;
       }
-
+      
       const wasClosed = !this.isOpen
       this.loading = false;
       this.didSelectFromOptions = false;
@@ -471,7 +456,6 @@ export default {
             // Determine direction of arrow up/down and determine new currentIndex
             const direction = keyCode === 40 ? 1 : -1;
             const newIndex = Math.max((parseInt(this.currentIndex) || 0) + (wasClosed ? 0 : direction), INDEX_IS_FOCUSED_ON_INPUT);
-
             this.setCurrentIndex(newIndex, this.totalResults);
             this.didSelectFromOptions = true;
             if (this.totalResults > 0 && this.currentIndex >= 0) {
@@ -482,26 +466,25 @@ export default {
               this.internalValue = this.searchInputOriginal;
               e.preventDefault();
             }
-
+            
             this.$nextTick(() => {
               this.ensureItemVisible(this.currentItem, this.currentIndex);
             })
             break;
           case 13: // Enter
             e.preventDefault();
-
             if (this.totalResults > 0 && this.currentIndex >= 0) {
               this.setChangeItem(this.getItemByIndex(this.currentIndex), true);
               this.didSelectFromOptions = true;
             }
-
+            
             this.loading = true;
             this.listeners.selected(this.didSelectFromOptions);
             break;
           case 27: // Escape
-            /**
-             * For 'search' input type, make sure the browser doesn't clear the
-             * input when Escape is pressed.
+            /** 
+             * For 'search' input type, make sure the browser doesn't clear the 
+             * input when Escape is pressed. 
              */
             this.loading = true;
             this.currentIndex = null;
@@ -519,7 +502,7 @@ export default {
      * @param {Boolean} overrideOriginalInput determine if the 'saved' original
      *   input should be updated. When a user selects an option, this will be
      *   updated, but if a user keys into the <input/> then the input will be
-     *   reset to the searchInputOriginal.
+     *   reset to the searchInputOriginal. 
      * @return {void}
      */
     setChangeItem(item, overrideOriginalInput = false) {
@@ -537,7 +520,7 @@ export default {
         this.ensureItemVisible(item, this.currentIndex);
       }
     },
-
+    
     /**
      * Function to standardize suggestion item object picked from sections
      * @returns {ResultItem}
@@ -551,7 +534,7 @@ export default {
         item
       };
     },
-
+    
     /**
      * Adjust the scroll position to the item in the suggestions overflow
      * @param {ResultItem} item - suggestion item
@@ -562,22 +545,18 @@ export default {
       const resultsScrollElement = this.$el.querySelector(
         selector || `.${this._componentAttrClassAutosuggestResults}`
       );
-
+      
       if (!resultsScrollElement) {
         return
       }
-
       const itemElement = resultsScrollElement.querySelector(`#${this.componentAttrPrefix}__results-item--${index}`);
       if (!itemElement) {
         return;
-      }
-
+      }      
       const resultsScrollWindowHeight = resultsScrollElement.clientHeight;
       const resultsScrollScrollTop = resultsScrollElement.scrollTop;
-
       const itemHeight = itemElement.clientHeight;
       const currentItemScrollOffset = itemElement.offsetTop;
-
       if (
         itemHeight + currentItemScrollOffset >=
         resultsScrollScrollTop + resultsScrollWindowHeight
@@ -593,7 +572,7 @@ export default {
      * @param {Number} index
      */
     updateCurrentIndex(index) {
-      this.setCurrentIndex(index, -1, true);
+      this.setCurrentIndex(index, -1, true);      
     },
     /**
      * Helper to detect if the user clicked on the scrollbar
@@ -603,8 +582,7 @@ export default {
      */
     clickedOnScrollbar(e, mouseX){
       const results = this.$el.querySelector(`.${this._componentAttrClassAutosuggestResults}`);
-
-      const mouseIsInsideScrollbar = results && results.clientWidth <= (mouseX + 17) &&
+      const mouseIsInsideScrollbar = results && results.clientWidth <= (mouseX + 17) && 
         mouseX + 17 <= results.clientWidth + 34
       return e.target.tagName === 'DIV' && results && mouseIsInsideScrollbar || false;
     },
@@ -624,19 +602,16 @@ export default {
     onDocumentMouseUp(e) {
       /** Do not re-render list on input click  */
       const isChild = this.$el.contains(e.target);
-
       /* Clicks outside of dropdown */
       if (!isChild) {
         this.loading = true;
         this.currentIndex = null;
         return;
       }
-
       if (e.target.tagName === 'INPUT' ||
         (this.clickedOnScrollbar(e, this.clientXMouseDownInitial))) {
         return;
       }
-
       /** Selects an item in the dropdown */
       this.loading = true;
       this.didSelectFromOptions = true;
@@ -644,7 +619,7 @@ export default {
       this.listeners.selected(true);
     },
     /**
-     * Sets the current index of the highlighted object, useful for aria
+     * Sets the current index of the highlighted object, useful for aria 
      * attributes like `aria-activedescendant` and toggling which result item
      * is highlighted.
      * @param {Number} newIndex
@@ -653,7 +628,7 @@ export default {
      */
     setCurrentIndex(newIndex, limit = -1, onHover = false) {
       let adjustedValue = newIndex;
-
+      
       /**
        * If you're not hovering, you might be keying outside of the bounds, so
        * we need to make sure that we adjust for the limits.
@@ -665,11 +640,10 @@ export default {
           adjustedValue = 0;
         }
       }
-
+      
       this.currentIndex = adjustedValue;
       const element = this.$el.querySelector(`#${this.componentAttrPrefix}__results-item--${this.currentIndex}`);
       const hoverClass = `${this.componentAttrPrefix}__results-item--highlighted`;
-
       if (this.$el.querySelector(`.${hoverClass}`)) {
         removeClass(this.$el.querySelector(`.${hoverClass}`), hoverClass);
       }

@@ -1,6 +1,6 @@
 {
-  "name": "vue-autosuggest",
-  "version": "2.2.0",
+  "name": "@sterx/vue-autosuggest-a11y-fix",
+  "version": "2.3.0-alpha.1",
   "description": "Vue autosuggest component.",
   "engines": {
     "node": "> 4",
@@ -24,11 +24,13 @@
     "setup": "yarn install",
     "precommit": "yarn test",
     "storybook": "start-storybook -p 9001 -c .storybook -s ./.storybook/public",
-    "storybook:build": "build-storybook -c .storybook -o docs/storybook"
+    "storybook:build": "build-storybook -c .storybook -o docs/storybook",
+    "postinstall": "echo \"Dont forget to run npm run build:umd in this folder\""
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "build"
   ],
   "main": "dist/vue-autosuggest.js",
   "module": "dist/vue-autosuggest.esm.js",

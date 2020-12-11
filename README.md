@@ -1,4 +1,10 @@
-﻿<div>
+﻿Custom fork of https://github.com/darrenjennings/vue-autosuggest -> https://github.com/simonsterckx/vue-autosuggest
+Forked for a11y improvements (siteimprove) 
+
+All credit goes to the original:
+## ------- Original readme from https://github.com/darrenjennings/vue-autosuggest -- 
+
+<div>
 <p align="center"><img width="100" src="docs/logo.png" alt="Vue logo"></a></p>
 
 <h1>vue-autosuggest</h1>
